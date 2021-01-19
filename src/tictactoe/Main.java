@@ -7,23 +7,35 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+
+    private static final Scanner scanner = new Scanner(System.in);
+    private static final char[][] tic = new char[3][3];
+
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
         System.out.print("Enter cells: ");
         String fromUserLine = scanner.nextLine().trim();
         char[] line = fromUserLine.toCharArray();
-        char[][] tic = new char[3][3];
-        System.out.println("---------");
 
         int y = 0;
         for (int i = 0; i < tic.length; i++) {
             for (int j = 0; j < tic[i].length; j++) {
-                tic[i][j] = line[y];
+                if (line[y] == '_') {
+                    tic[i][j] = ' ';
+                } else {
+                    tic[i][j] = line[y];
+                }
                 y++;
             }
         }
 
+        print();
+        doStep();
+        print();
+//        getResult(fromUserLine);
+    }
 
+    private static void print() {
+        System.out.println("---------");
         for (int i = 0; i < tic.length; i++) {
             System.out.print("| ");
             for (int j = 0; j < tic[i].length; j++) {
@@ -32,7 +44,6 @@ public class Main {
             System.out.println("|");
         }
         System.out.println("---------");
-        getResult(fromUserLine);
     }
 
     private static void getResult(String fromUserLine) {
@@ -64,7 +75,7 @@ public class Main {
         }
         if (truResult) {
             if (result.isEmpty()) {
-                if (fromUserLine.contains("_")) {
+                if (fromUserLine.contains(" ")) {
                     System.out.println("Game not finished");
                     return;
                 }
@@ -75,5 +86,29 @@ public class Main {
         } else {
             System.out.println("Impossible");
         }
+    }
+
+    private static void doStep() {
+        while (true) {
+            System.out.print("Enter the coordinates: ");
+            String[] step = scanner.nextLine().trim().split(" ");
+            try {
+                int one = Integer.parseInt(step[0]) - 1;
+                int two = Integer.parseInt(step[1]) - 1;
+
+                if (tic[one][two] == ' ') {
+                    tic[one][two] = 'X';
+                } else {
+                    System.out.println("This cell is occupied! Choose another one!");
+                    continue;
+                }
+                break;
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("Coordinates should be from 1 to 3!");
+            } catch (NumberFormatException e) {
+                System.out.println("You should enter numbers!");
+            }
+        }
+
     }
 }
