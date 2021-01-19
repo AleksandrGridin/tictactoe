@@ -12,26 +12,17 @@ public class Main {
     private static final char[][] tic = new char[3][3];
 
     public static void main(String[] args) {
-        System.out.print("Enter cells: ");
-        String fromUserLine = scanner.nextLine().trim();
-        char[] line = fromUserLine.toCharArray();
+        init();
+        doStep();
+    }
 
-        int y = 0;
+    private static void init() {
         for (int i = 0; i < tic.length; i++) {
             for (int j = 0; j < tic[i].length; j++) {
-                if (line[y] == '_') {
-                    tic[i][j] = ' ';
-                } else {
-                    tic[i][j] = line[y];
-                }
-                y++;
+                tic[i][j] = ' ';
             }
         }
-
         print();
-        doStep();
-        print();
-//        getResult(fromUserLine);
     }
 
     private static void print() {
@@ -46,50 +37,33 @@ public class Main {
         System.out.println("---------");
     }
 
-    private static void getResult(String fromUserLine) {
-        int getOfromLine = (int) fromUserLine.chars().filter(s -> s == 'O').count();
-        int getXfromLine = (int) fromUserLine.chars().filter(s -> s == 'X').count();
-        if (Math.abs(getOfromLine - getXfromLine) >= 2) {
-            System.out.println("Impossible");
-            return;
-        }
+    private static boolean checkResult(char[][] grid) {
         List<String> list = new ArrayList<>();
-        list.add(String.valueOf(fromUserLine.charAt(0)) + fromUserLine.charAt(1) + fromUserLine.charAt(2));
-        list.add(String.valueOf(fromUserLine.charAt(3)) + fromUserLine.charAt(4) + fromUserLine.charAt(5));
-        list.add(String.valueOf(fromUserLine.charAt(6)) + fromUserLine.charAt(7) + fromUserLine.charAt(8));
-        list.add(String.valueOf(fromUserLine.charAt(0)) + fromUserLine.charAt(3) + fromUserLine.charAt(6));
-        list.add(String.valueOf(fromUserLine.charAt(1)) + fromUserLine.charAt(4) + fromUserLine.charAt(7));
-        list.add(String.valueOf(fromUserLine.charAt(2)) + fromUserLine.charAt(5) + fromUserLine.charAt(8));
-        list.add(String.valueOf(fromUserLine.charAt(0)) + fromUserLine.charAt(4) + fromUserLine.charAt(8));
-        list.add(String.valueOf(fromUserLine.charAt(2)) + fromUserLine.charAt(4) + fromUserLine.charAt(6));
+        list.add(String.valueOf(grid[0][0]) + grid[0][1] + grid[0][2]);
+        list.add(String.valueOf(grid[1][0]) + grid[1][1] + grid[1][2]);
+        list.add(String.valueOf(grid[2][0]) + grid[2][1] + grid[2][2]);
+        list.add(String.valueOf(grid[0][0]) + grid[1][0] + grid[2][0]);
+        list.add(String.valueOf(grid[0][1]) + grid[1][1] + grid[2][1]);
+        list.add(String.valueOf(grid[0][2]) + grid[1][2] + grid[2][2]);
+        list.add(String.valueOf(grid[0][0]) + grid[1][1] + grid[2][2]);
+        list.add(String.valueOf(grid[0][2]) + grid[1][1] + grid[2][0]);
 
         String result = "";
-        boolean truResult = true;
+        boolean truResult = false;
         for (String r : list) {
             if (r.equals("XXX") || r.equals("OOO")) {
-                if (!result.isEmpty()) {
-                    truResult = false;
-                }
                 result = r;
+                truResult = true;
+                System.out.println(result.charAt(0) +" wins");
             }
         }
-        if (truResult) {
-            if (result.isEmpty()) {
-                if (fromUserLine.contains(" ")) {
-                    System.out.println("Game not finished");
-                    return;
-                }
-                System.out.println("Draw");
-                return;
-            }
-            System.out.println(result.charAt(0) + " wins");
-        } else {
-            System.out.println("Impossible");
-        }
+        return truResult;
     }
 
     private static void doStep() {
-        while (true) {
+        int i = 0;
+        char xOrY = 'X';
+        while (i != 9) {
             System.out.print("Enter the coordinates: ");
             String[] step = scanner.nextLine().trim().split(" ");
             try {
@@ -97,17 +71,30 @@ public class Main {
                 int two = Integer.parseInt(step[1]) - 1;
 
                 if (tic[one][two] == ' ') {
-                    tic[one][two] = 'X';
+                    tic[one][two] = xOrY;
+                    print();
+                    if (checkResult(tic)) {
+                        break;
+                    }
+                    if (xOrY == 'X') {
+                        xOrY = 'O';
+                    } else {
+                        xOrY = 'X';
+                    }
                 } else {
                     System.out.println("This cell is occupied! Choose another one!");
                     continue;
                 }
-                break;
+
+                i++;
             } catch (IndexOutOfBoundsException e) {
                 System.out.println("Coordinates should be from 1 to 3!");
             } catch (NumberFormatException e) {
                 System.out.println("You should enter numbers!");
             }
+        }
+        if (i == 9) {
+            System.out.println("Draw");
         }
 
     }
